@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import re
 # -------------------------------------------------------------
 dataset = "./DSMLC Final Competition 2024 Dataset.xlsx"
@@ -14,8 +13,8 @@ df.to_csv(dataset)
 df = pd.read_csv(dataset)
 
 # Import population.csv
-dataset2 = "./population.csv"
-popdf = pd.read_csv(dataset2)
+# dataset2 = "./population.csv"
+# popdf = pd.read_csv(dataset2)
 
 # dataframe with countries (on its own) only
 df = df.dropna(subset="Code")
@@ -45,10 +44,8 @@ df.columns = colName
 df = df.drop(df.columns[15:], axis=1)
 df = df.drop(df.columns[4:14], axis=1)
 
-# Remove for missing data
-arr = np.where(df.isnull())
-for i,j in zip(arr[0], arr[1]):
-  df = df.drop(i, axis=0)
+# Remove missing data
+df = df.dropna(subset="12.2.2")
 
 # Remove data with value 0 from sdg 12.2.2
 arr = df.query("`12.2.2` == 0")["Country"].unique()
@@ -68,17 +65,15 @@ for i in arr:
 
 df.drop(df[df["Country"] == "World"].index, inplace=True)
 
-# Rename Entity to Country
-popdf.columns.values[0] = "Country"
+# # Rename Entity to Country
+# popdf.columns.values[0] = "Country"
 
-# Merge population to current df
-df2_filtered = popdf[popdf["Country"].isin(unique_countries)]
-df2_filtered = df2_filtered[(df2_filtered["Year"] >= 2000) & (df2_filtered["Year"] <= 2019)]
-df = pd.merge(df, df2_filtered[["Country", "Year", "Population (historical estimates)"]], on=["Country", "Year"], how="left")
+# # Merge population to current df
+# df2_filtered = popdf[popdf["Country"].isin(unique_countries)]
+# df2_filtered = df2_filtered[(df2_filtered["Year"] >= 2000) & (df2_filtered["Year"] <= 2019)]
+# df = pd.merge(df, df2_filtered[["Country", "Year", "Population (historical estimates)"]], on=["Country", "Year"], how="left")
 
-# Renamed column
-df.columns.values[5] = re.split(r"\s", df.columns[5])[0]
-
-print(df)
+# # Renamed column
+# df.columns.values[5] = re.split(r"\s", df.columns[5])[0]
 
 df.to_csv(dataset, index=False)
